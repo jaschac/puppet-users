@@ -1,0 +1,38 @@
+{
+  "author": "Jascha Casadio",
+  "dependencies": [
+    {
+      "name":"puppetlabs-stdlib",
+      "version_requirement" : ">= 2.2.1 <= 4.9.0"
+      }
+  ],  
+  "issues_url": "https://github.com/jaschac/puppet-users",
+  "license": "Apache 2.0",
+  "name": "lostinmalloc-users",
+  "operatingsystem_support": [
+    {   
+      "operatingsystem": "Debian",
+      "operatingsystemrelease": [
+        "7",
+        "8" 
+      ]   
+    }   
+  ],  
+  "project_page": "https://github.com/jaschac/puppet-users",
+  "requirements": [
+    {   
+      "name": "puppet",
+      "version_requirement": ">=4.0.0 <5.0.0"
+    }   
+  ],  
+  "source": "https://github.com/jaschac/puppet-users",
+  "summary": "Manage users and their secrets",
+  "tags": [
+    "bashrc",
+    "groups",
+    "secrets"
+    "ssh",
+    "users",
+  ],
+  "version": "0.0.1"
+}
