@@ -1,5 +1,6 @@
 # Add something intelligent
 class users::params(
+
   Optional[
     Hash[
       String,
@@ -20,7 +21,14 @@ class users::params(
       }]
       ]
   ] $accounts,
-  Optional[Tuple[String, default]] $dependencies,
+
+  Optional[
+    Hash[
+      String,
+      String
+      ]
+    ] $dependencies,
+
   Enum[
       'absent',
       'held',

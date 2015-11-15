@@ -22,7 +22,7 @@ define users::manage
     shell      => '/bin/bash',
     groups     => [],
     home       => "/home/${name}",
-    require    => Package[$::users::dependencies],
+    require    => Package[keys($::users::dependencies)],
   }   
 
   if $userdata['managehome'] and $userdata['present'] {
