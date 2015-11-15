@@ -2,7 +2,7 @@
 #### Table of Contents
 1. [Overview](#overview)
 2. [Development](#development)
-3. Contacts
+3. [Contacts](#contacts)
 
 ## Overview
 This module manages users and their secrets. It is distributed through the Apache License 2.0. Please do refer to the LICENSE for details.
