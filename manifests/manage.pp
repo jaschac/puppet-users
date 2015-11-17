@@ -20,7 +20,10 @@ define users::manage
     managehome => $userdata['managehome'],
     password   => $userdata['password'], 
     shell      => '/bin/bash',
-    groups     => [],
+    groups     => empty($userdata['groups']) ? {
+      false => $userdata['groups'],
+      true  => [],
+      },
     home       => "/home/${name}",
     require    => Package[keys($::users::dependencies)],
   }   
