@@ -9,7 +9,7 @@ class users
   if $::users::accounts{
     $::users::accounts.each |$username, $userdata|{
       
-      # Create the users associated to the user, if any
+      # Manage the groups associated to the user, if any
       if $userdata['groups']{
         $userdata['groups'].each |$groupname|{
           if !defined(Group[$groupname]){
@@ -21,6 +21,7 @@ class users
 	  }
 	}
 
+      # Manage the user resource itself
       @users::manage{$username:
         userdata => $userdata,
 	}

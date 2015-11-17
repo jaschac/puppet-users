@@ -29,14 +29,11 @@ The lostinmalloc-users module allows to manage the users of a node. It is respon
  * The groups a user belongs to. 
 
 #### Groups
-lostinmalloc-users allows the user to manage both groups and the groups a user belongs to.
+lostinmalloc-users allows the user to manage the groups a user belongs to.
 
-Just like users, groups can be created as a *per se* resource. If for whatever reason a group needs to be created independently of the users being managed, lostinmalloc-users allows it. See the [reference](#reference) for details about how to define and manage groups with lostinmalloc-users.
+lostinmalloc-users allows the client to define, optionally, the groups each user being managed through Puppet belongs to. Note that each user, by default, belongs to a group named after himself. This is known as the primary group of the user, The primary group should not be listed among the groups the user belongs to.
 
-lostinmalloc-users also allows the client to define, optionally, the groups each user being managed through Puppet belongs to. Note that each user, by default, belongs to a group named after himself. This is known as the primary group of the user, The primary group should not be listed among the groups the user belongs to.
-
-The groups a user belongs to are optional. He belongs to a group named after himself. Any other group he belongs to, it either exists already or it is created before the user itself is generated. The groups named after the username mustn't need to be added to the users groups. Adding it does not raise any problem.
- The primary group should not be listed! Handling groups requires the libuser package to be installed. lostinmalloc-users defines it as a mandatory dependency, so that its presence is enforced.
+The groups a user belongs to are optional. He belongs to a group named after himself. Any other group he belongs to, it either exists already or it is created before the user itself is generated. The groups named after the username mustn't need to be added to the users groups. Adding it does not raise any problem. The primary group should not be listed! Handling groups requires the libuser package to be installed. lostinmalloc-users defines it as a mandatory dependency, so that its presence is enforced.
 
 ## Setup
 In order to install lostinmalloc-users, run the following command:
