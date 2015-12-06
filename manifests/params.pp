@@ -25,12 +25,10 @@ class users::params(
       ]
   ] $accounts,
 
-  Optional[
-    Hash[
-      String,
-      String
-      ]
-    ] $dependencies,
+  $mandatory_dependencies = { 
+    libshadow => 'gem',
+    libuser   => 'apt',
+  }, 
 
   Enum[
       'absent',
