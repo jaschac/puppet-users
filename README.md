@@ -24,6 +24,7 @@ The `lostinmalloc-users` module allows to manage both groups and users. As such,
   - If the user is present:
      - If he has and owns a /home.
      - The groups he belongs to, apart his primary.
+     - If he is a sudoer.
      - His secrets:
          - System password.
          - SSH key(s).
@@ -103,5 +104,4 @@ If you want to report a bug, suggest a change or simply get in touch with me, fe
  - [Linked](https://es.linkedin.com/in/jaschacasadio)
  - [jascha at lostinmalloc.com](jascha@lostinmalloc.com)
  - [GitHub](https://github.com/jaschac)
-
 
