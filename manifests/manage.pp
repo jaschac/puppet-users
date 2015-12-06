@@ -21,7 +21,7 @@ define users::manage
       true  => [],
       },
     home       => "/home/${name}",
-    require    => Package[keys($::users::mandatory_dependencies)],
+    require    => Package[[keys($::users::mandatory_dependencies)], [keys($::users::extra_dependencies)]],
   }   
   
 
