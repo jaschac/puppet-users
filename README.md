@@ -15,28 +15,32 @@
 7. [Contacts](#contacts)
 
 ## Overview
-This module manages users and their secrets. It is distributed through the Apache License 2.0. Please do refer to the LICENSE for details.
+The `lostinmalloc-users` module manages groups, users and their secrets. It is distributed through the Apache License 2.0. Please do refer to the LICENSE for details.
 
 ## Module Description
-The lostinmalloc-users module allows to manage the users of a node. It is responsible of:
+The `lostinmalloc-users` module allows to manage both groups and users. As such, it is responsible of:
 
- * Defining whether a user is present or absent.
-    * If present the user can simply be disabled so that his belongings are not accessible to anyone, but not wiped out.
-    * If present, whether he has a home or not.
- * Managing each user's secrets:
-    * System password.
-    * SSH keys.
- * The groups a user belongs to. 
+ - Defining whether a user is present or absent.
+  - If the user is present:
+     - If he has and owns a /home.
+     - The groups he belongs to, apart his primary.
+     - His secrets:
+         - System password.
+         - SSH key(s).
+             - His own.
+             - Those that can be used to login as him into the system.
+  - If the user is not present:
+     - His /home, if it does exist, is wiped out.
 
 #### Groups
-lostinmalloc-users allows the user to manage the groups a user belongs to.
+`lostinmalloc-users` allows the client to define, optionally, the groups each user belongs to. Note that each user, by default, belongs to a group named after himself. This is known as the *primary group* of the user, The primary group should not be listed among the groups the user belongs to.
 
-lostinmalloc-users allows the client to define, optionally, the groups each user being managed through Puppet belongs to. Note that each user, by default, belongs to a group named after himself. This is known as the primary group of the user, The primary group should not be listed among the groups the user belongs to.
+Any other group a user belongs to either exists already or is created before the user itself is created.
 
-The groups a user belongs to are optional. He belongs to a group named after himself. Any other group he belongs to, it either exists already or it is created before the user itself is generated. The groups named after the username mustn't need to be added to the users groups. Adding it does not raise any problem. The primary group should not be listed! Handling groups requires the libuser package to be installed. lostinmalloc-users defines it as a mandatory dependency, so that its presence is enforced.
+Handling groups requires the `libuser` package to be installed. `lostinmalloc-users` defines it as a mandatory dependency, so that its presence is enforced.
 
 ## Setup
-In order to install lostinmalloc-users, run the following command:
+In order to install `lostinmalloc-users`, run the following command:
 ```bash
 $ sudo puppet module install lostinmalloc-cntlm
 ```
@@ -48,32 +52,24 @@ node 'puppet.lostinmalloc.com' {
 ```
 
 #### Requirements
-The lostinmalloc-users module requires:
+The `lostinmalloc-users` module requires:
 
- * All the data to be passed through Hiera. See [usage](#usage) for an example on how to configure it.
- * Puppet 4, since it uses its new features.
+ - All the data to be passed through Hiera. See [usage](#usage) for an example on how to configure it.
+ - Puppet 4, since it uses its features.
 
 ##### Managing Passwords
-Managing a user's password requires **libshadow** to be already installed on the system. This is clearly explained by the useradd provider itself in the documentation that comes with the [code](https://github.com/puppetlabs/puppet/blob/master/lib/puppet/provider/user/useradd.rb). This library is essential since it allows Puppet to manage shadows. If the library is not installed when lostinmalloc-users is executed and told to add the password of a user, this is what happens:
+Managing a user's password requires `libshadow` to be already installed on the system. This is clearly explained by the `useradd` provider itself in the documentation that comes with the [code](https://github.com/puppetlabs/puppet/blob/master/lib/puppet/provider/user/useradd.rb). This library is essential since it allows Puppet to manage shadows. If the library is not installed when `lostinmalloc-users` is executed and told to add the password of a user, this is what happens:
 
- * The user will be created and properly configured, but his password will not be set. Puppet, if run in verbose mode, will warn about not being able to manage shadows.
- * The libshadow package is installed through gem since it is part of the mandatory dependencies. Starting from the next execution, the user will be updated and his password will be properly set in the shadows.
+ - The user will be created and properly configured, but his password will not be set. Puppet, if run in verbose mode, will warn about not being able to manage shadows.
+ - The `libshadow` package is installed through gem since it is part of the mandatory dependencies. Starting from the next execution, the user will be updated and his password will be properly set in the shadows.
 
-If Puppet is installed through APT (puppetlabs-release), libshadow is automatically installed into the system. If otherwise Puppet is manually installed through gems, it is not ans it is duty of the administrator(s) of the system to either install it or notify everyone that the users' passwords will not be set on the first run.
+If Puppet is installed through APT (`puppetlabs-release`), `libshadow` is automatically installed into the system. If otherwise Puppet is manually installed through gems, it is not ans it is duty of the administrator(s) of the system to either install it or notify everyone that the users' passwords will not be set on the first run.
 
 ### What lostinmalloc-users affects
-By managing users, lostinmalloc-users affects several critical aspects of a node:
+By managing users, `lostinmalloc-users` affects several critical aspects of a node:
 
-* It manages how a user can log in and out, so that it can lock someone out of the system.
-* It manages a user's home directory, so it can potentially wipe out all his files.
-
-Given the importance of the data manages, lostinmalloc-users distinguishes users into 3 categories:
-
- * Present and active.
- * Present but disabled. The user's data is preserved but made unavailable to everyone. His SSH key no longer allows him to log into the system as someone else.
- * Absent. The user's data is completely wiped out of the system.
-
-**No user is wiped out by default**. This in order to avoid erasing existing users. The client must explicitly set a user's wipe out flag to true in case he wants Puppet to delete all his belongings.
+ - It manages how a user can log in and out, so that it can lock someone out of the system.
+ - It manages a user's home directory, so **it can potentially wipe out all his files**.
 
 ## Reference
 Users are represented as virtual resources, which are first validated then realized. Their data must be provided through Hiera. A user has the following attributes:
@@ -86,9 +82,9 @@ Users are represented as virtual resources, which are first validated then reali
 
 A user is, by default,disabled in the system. As such:
 
- * He has a home but it is not accessible.
- * He cannot log into the system
- * His SSH keys are not working on any account.
+ - He has a home but it is not accessible.
+ - He cannot log into the system
+ - His SSH keys are not working on any account.
 
 Users that are already present in the system but that are not managed through Puppet are left untouched.
 
@@ -99,7 +95,7 @@ Users that are already present in the system but that are not managed through Pu
 @TODO
 
 ## Development
-The lostinmalloc-users module is being actively developed. As functionality is added and tested, it will be cherry-picked into the master branch. This README file will be promptly updated as t hat happens. You can contact me through the official page of this module: https://github.com/jaschac/puppet-users. Please do report any bug and suggest new features/improvements.
+The `lostinmalloc-users` module is being actively developed. As functionality is added and tested, it will be cherry-picked into the master branch. This `README` file will be promptly updated as t hat happens. You can contact me through the official page of this module: https://github.com/jaschac/puppet-users. Please do report any bug and suggest new features/improvements.
 
 ## Contacts
 If you want to report a bug, suggest a change or simply get in touch with me, feel free to:
@@ -107,3 +103,5 @@ If you want to report a bug, suggest a change or simply get in touch with me, fe
  - [Linked](https://es.linkedin.com/in/jaschacasadio)
  - [jascha at lostinmalloc.com](jascha@lostinmalloc.com)
  - [GitHub](https://github.com/jaschac)
+
+
