@@ -25,9 +25,7 @@ define users::manage
   }   
   
 
-  if $userdata['present']{
- 
-    if $userdata['managehome']{
+  if $userdata['present'] and $userdata['managehome']{
       
       file { "/home/${name}":
         ensure  => directory,
@@ -49,17 +47,6 @@ define users::manage
           owner   => $name,
           require => File["/home/${name}/.ssh"],
         }
-      }
-    }
-    
-    else{
-      
-        file { "/home/${name}":
-          ensure  => absent,
-          force   => true,
-          require => User[$name],
-        }   
-
       }
     }
   
