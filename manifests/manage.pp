@@ -1,7 +1,24 @@
 # Manages an user, his home and files
 define users::manage
   (
-  $userdata 	# TODO: add validation
+  Struct[{
+    authorized_keys => Optional[
+      Tuple[String, default]
+    ],  
+    groups => Optional[
+      Array[String, 1]
+    ],  
+    managehome      => Boolean,
+    password        => String[0, default],
+    present         => Boolean,
+    ssh             => Optional[
+      Struct[{
+        key       => String[1, default],
+        key_label => String[1, default],
+        key_type  => String[7, 7], 
+      }]  
+    ],  
+  }] $userdata
 ){
   File{
     group => $name,
