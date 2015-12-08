@@ -1,4 +1,4 @@
-#Manages an user, his home and files
+# Manages an user, his home and files
 define users::manage
   (
   $userdata 	# TODO: add validation
