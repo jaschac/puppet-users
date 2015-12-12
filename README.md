@@ -64,11 +64,22 @@ Users that are not managed through `lostinmalloc-users` are left untouched.
 #### Requirements
 This module requires **Puppet 4**.
 
-In terms of dependencies, the following modules are required:
+In terms of dependencies, `lostinmalloc-users` defines two kinds of dependencies:
 
-  - `puppetlabs-stdlib >= 2.2.1 <= 4.9.0`
+  - Mandatory: are hardcoded into `manifest/params.pp` as `mandatory_dependencies`.
+  - Optional are provided by the client through `Hiera` using the key `users::params::extra_dependencies`. For example, to get `cmatrix` installed as an optional dependency, we define it like this in `Hiera`:
 
-##### Managing Passwords
+```bash
+users::params::extra_dependencies:
+  cmatrix: 'apt'
+```
+
+All of the dependencies must be supplied as a hash:
+
+  - The key represents the name of the package.
+  - The value represents the provider that Puppet must use to install it.
+
+#### Managing Passwords
 Managing a user's password requires `libshadow` to be already installed on the system. This is clearly explained by the `useradd` provider itself in the documentation that comes with the [code](https://github.com/puppetlabs/puppet/blob/master/lib/puppet/provider/user/useradd.rb). This library is essential since it allows Puppet to manage shadows. If the library is not installed when `lostinmalloc-users` is executed and told to add the password of a user, this is what happens:
 
  - The user will be created and properly configured, but his password will not be set. Puppet, if run in verbose mode, will warn about not being able to manage shadows.
@@ -84,10 +95,10 @@ Any other group a user belongs to either exists already or is created before the
 Handling groups requires the `libuser` package to be installed. `lostinmalloc-users` defines it as a mandatory dependency, so that its presence is enforced.
 
 ## Usage
-All data must be provided through 'Hiera'. 
+All data must be provided through `Hiera`. 
 
 ## Reference
-All data must be provided through 'Hiera'. A user is defined by many attributes, some of which, *in italic*, are optional:
+All data must be provided through `Hiera`. A user is defined by many attributes, some of which, *in italic*, are optional:
 
   -  *`authorized_keys`*: A list of strings representing users managed through `lostinmalloc-users` that can log into the system as him. The public keys of these users are stored into his `$HOME/.ssh/authorized_keys`. If this value is not given for the user, none can log in as him through SSH keys.
   - *`groups`*: the groups he belongs to. Note that the group named after himself, also known as his *primary group*, should not be listed here, since it is generated automatically by the system. The groups the user belongs to are generated before any user is created, if they don't exist already.
@@ -113,3 +124,4 @@ All data must be provided through 'Hiera'. A user is defined by many attributes,
 
 ## Development
 You can contact me through the official page of this module: https://github.com/jaschac/puppet-users. Please do report any bug and suggest new features/improvements.
+

@@ -36,14 +36,6 @@ class users::params(
     libshadow => 'gem',
     libuser   => 'apt',
     sudo      => 'apt',
-  },
-
-  Enum[
-      'absent',
-      'held',
-      'installed',
-      'latest',
-      'present',
-      'purged'] $package_ensure,
+  }
 ){
 }

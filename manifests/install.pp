@@ -17,7 +17,7 @@ class users::install {
     $dependencies.each |$dependency,$provider| {
       if !defined(Package[$dependency]) {
         Package { $dependency:
-          ensure   => $::users::package_ensure,
+          ensure   => installed,
           provider => $provider,
           tag      => 'dependency',
         }
