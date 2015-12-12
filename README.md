@@ -97,6 +97,69 @@ Handling groups requires the `libuser` package to be installed. `lostinmalloc-us
 ## Usage
 All data must be provided through `Hiera`. 
 
+In the following example:
+
+  - The user `dave`:
+    - Is be created.
+    - Owns his `$HOME`.
+    - Is a `sudoer`.
+    - Can login with username/password.
+    - Has a publish SSH key.
+    - Allows users `dave`, `gru` and `stuart` to log in as him through SSH. Note that `gru` does not exist, so it will be skipped.
+  - The user `stuart`:
+    - Is created.
+    - Does not own a `$HOME`.
+    - Cannot login with username/password.
+    - Has a public SSH key.
+    - Does not allow anyone to log in as him through SSH.
+
+```bash
+users::params::accounts:
+  dave:
+    authorized_keys:
+      - 'dave'
+      - 'gru'
+      - 'stuart'
+    groups:
+      - 'sudo'
+      - 'foo'
+    managehome: true
+    password: '$6$3xG2CaJYHkmVQ$340oMY0S1YSEwhiPpTC3Qz/Gz3VR2KC4iQefhrc00w2PunFXpYCmTanJ4ORXzMjQGASPEA13IUmwTS82Uj85c1'
+    present: true
+    ssh:
+      key: 'QWERTY'
+      key_label: 'dave@minions.com'
+      key_type: 'ssh-rsa'
+  stuart:
+    groups:
+      - 'foo'
+      - 'foo2'
+    managehome: false
+    password: ''
+    present: true
+    ssh:
+      key: 'banana'
+      key_label: 'stuart@minions.com'
+      key_type: 'ssh-rsa'
+```
+```bash
+$ id dave
+uid=1004(dave) gid=1007(dave) groups=1007(dave),27(sudo),1004(foo)
+$ id stuart
+uid=1005(stuart) gid=1005(stuart) groups=1005(stuart),1004(foo)
+
+$ ls -l /home
+drwxr-xr-x 3 dave   dave   4096 Dec 12 19:23 dave
+
+$ cat /home/dave/.ssh/authorized_keys
+ssh-rsa QWERTY dave@minions.com
+ssh-rsa banana stuart@minions.com
+
+$ sudo cat /etc/shadow
+dave:$6$3xG2CaJYHkmVQ$340oMY0S1YSEwhiPpTC3Qz/Gz3VR2KC4iQefhrc00w2PunFXpYCmTanJ4ORXzMjQGASPEA13IUmwTS82Uj85c1:16775:0:99999:7:::
+stuart::16781:0:99999:7:::
+```
+
 ## Reference
 All data must be provided through `Hiera`. A user is defined by many attributes, some of which, *in italic*, are optional:
 
