@@ -26,13 +26,13 @@
     }   
   ],  
   "source": "https://github.com/jaschac/puppet-users",
-  "summary": "Manage users and their secrets",
+  "summary": "A Puppet module to manage groups, users and their secrets.",
   "tags": [
-    "bashrc",
     "groups",
     "secrets",
     "ssh",
+    "sudoers",
     "users"
   ],
-  "version": "0.1.15"
+  "version": "0.1.16"
 }
