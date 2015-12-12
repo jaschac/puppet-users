@@ -133,7 +133,6 @@ users::params::accounts:
   stuart:
     groups:
       - 'foo'
-      - 'foo2'
     managehome: false
     password: ''
     present: true
