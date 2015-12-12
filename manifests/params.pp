@@ -6,21 +6,21 @@ class users::params(
       String,
       Struct[{
         authorized_keys => Optional[
-	  Tuple[String, default]
-	  ],
+          Tuple[String, default]
+        ],
         groups => Optional[
           Array[String, 1]
-	  ],
-	managehome      => Boolean,
-	password        => String[0, default],
-	present         => Boolean,
-	ssh             => Optional[
-	  Struct[{
+        ],
+        managehome => Boolean,
+        password   => String[0, default],
+        present    => Boolean,
+        ssh        => Optional[
+          Struct[{
             key       => String[1, default],
-	    key_label => String[1, default],
-	    key_type  => String[7, 7],
-	    }]
-	  ],
+            key_label => String[1, default],
+            key_type  => String[7, 7],
+          }]
+        ],
       }]
       ]
   ] $accounts,
@@ -29,14 +29,14 @@ class users::params(
     Hash[
       String,
       String
-      ]   
-    ] $extra_dependencies,
+    ]
+  ] $extra_dependencies,
 
-  $mandatory_dependencies = { 
+  $mandatory_dependencies = {
     libshadow => 'gem',
     libuser   => 'apt',
     sudo      => 'apt',
-  }, 
+  },
 
   Enum[
       'absent',

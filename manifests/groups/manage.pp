@@ -6,11 +6,11 @@ define users::groups::manage
     ] $data
 ){
   
-  $data.each |$groupname|{
-    if !defined(Group[$groupname]){
+  $data.each |$groupname| {
+    if !defined(Group[$groupname]) {
       Group { $groupname:
-        name   => $groupname,
         ensure => present,
+        name   => $groupname,
       }
     }
   }

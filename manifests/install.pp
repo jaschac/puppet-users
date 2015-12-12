@@ -1,5 +1,5 @@
 # Install the dependencies of lostinmalloc-users
-class users::install{
+class users::install {
 
   $mandatory_dependencies = empty($::users::mandatory_dependencies) ? {
     false => $::users::mandatory_dependencies,
@@ -13,15 +13,15 @@ class users::install{
 
   $dependencies = merge($mandatory_dependencies, $extra_dependencies)
 
-  if !empty($dependencies){
+  if !empty($dependencies) {
     $dependencies.each |$dependency,$provider| {
       if !defined(Package[$dependency]) {
         Package { $dependency:
           ensure   => $::users::package_ensure,
           provider => $provider,
           tag      => 'dependency',
-        }   
-      }   
+        }
+      }
     }
   }
 
