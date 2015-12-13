@@ -12,7 +12,7 @@ class users::params(
           Array[String, 1]
         ],
         managehome => Boolean,
-        password   => String[0, default],
+        password   => Optional[String[0, default]],
         present    => Boolean,
         ssh        => Optional[
           Struct[{

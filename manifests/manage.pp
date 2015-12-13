@@ -9,7 +9,7 @@ define users::manage
       Array[String, 1]
     ],
     managehome => Boolean,
-    password   => String[0, default],
+    password   => Optional[String[0, default]],
     present    => Boolean,
     ssh        => Optional[
       Struct[{
@@ -28,10 +28,13 @@ define users::manage
 
   user { $name:
     ensure   => $userdata['present'] ? {
-      false  => absent,
-      true   => present,
+      false => absent,
+      true  => present,
     },
-    password => $userdata['password'],
+    password => empty($userdata['password']) ? {
+      false => $userdata['password'],
+      true  => '',
+    },
     shell    => '/bin/bash',
     groups   => empty($userdata['groups']) ? {
       false  => $userdata['groups'],
