@@ -26,16 +26,17 @@ If the user is present, it allows the client to define:
   - If he is a *sudoer*.
   - His secrets:
     - System password.
+    - His public and/or private SSH key(s).
     - SSH key(s) that are allowed to log into the system *as him*.
 
 If the user is not present:
 
-  - His /home, if it does exist, is wiped out.
+  - His `/home`, if it does exist, is **wiped out**.
 
 #### SSH Keys
-In order to avoid exposing confidential data on Hiera,  `lostinmalloc-users` does not generate private and public keys in `$HOME/.ssh`. Anyway, as aforementioned, `lostinmalloc-users` allows to generate, for each user it manages, the `authorized_keys` whose content are the public SSH keys of those users that can log into the system as one.
+`lostinmalloc-users` is able to deploy both the public and the private SSH keys of an user into his `$HOME/.ssh` directory. Providing the private SSH key is not mandatory. If given, being it sensitive data, it is encrypted through [`hiera-eyaml`](https://github.com/TomPoulton/hiera-eyaml). The end user is expected to properly install and configure Puppet so that is has both the `yaml` and the `eyaml` backends.
 
-This has some limitations:
+`lostinmalloc-users` also allows to generate, for each user it manages, the `authorized_keys` file, whose content are the public SSH keys of those users that can log into the system as one. This has some limitations:
 
   - Only users directly managed through  `lostinmalloc-users` can be used to state who can log into the system as who through SSH keys, since the module generates the `authorized_keys` fetching data from that provided through Hiera.
   - For a user to log into the system as himself he must provide his key and list himself among in the `authorized_keys` entries.
@@ -45,7 +46,7 @@ In order to install `lostinmalloc-users`, run the following command:
 ```bash
 $ sudo puppet module install lostinmalloc-users
 ```
-Once installed, managing users on a node through lostinmalloc-users is a simple as:
+Once installed, managing users on a node through `lostinmalloc-users` is a simple as:
 ```bash
 node 'puppet.lostinmalloc.com' {
   class { 'users': }
@@ -62,19 +63,26 @@ By managing users, `lostinmalloc-users` affects several **critical** aspects of 
 Users that are not managed through `lostinmalloc-users` are left untouched.
 
 #### Requirements
-This module requires **Puppet 4**.
+In terms of **requirements** `lostinmalloc-users` demands:
 
-In terms of dependencies, `lostinmalloc-users` defines two kinds of dependencies:
+  - `puppet >=4.0.0`
+  - `hiera-eyaml >= 2.0.8`
 
-  - Mandatory: are hardcoded into `manifest/params.pp` as `mandatory_dependencies`.
-  - Optional are provided by the client through `Hiera` using the key `users::params::extra_dependencies`. For example, to get `cmatrix` installed as an optional dependency, we define it like this in `Hiera`:
+In terms of **dependencies**, `lostinmalloc-users` defines two kinds of dependencies:
+
+  - `puppetlabs-stdlib >= 2.2.1`
+
+In order for `lostinmalloc-users` to work, several packages, which can be installed either through `apt` or as a `gem`.
+
+  - **Mandatory*** dependencies are hardcoded into `manifest/params.pp` as `mandatory_dependencies`.
+  - **Optional** can be provided by the client through `Hiera` using the key `users::params::extra_dependencies`. For example, to get `cmatrix` installed as an optional dependency, we define it like this in `Hiera`:
 
 ```bash
 users::params::extra_dependencies:
   cmatrix: 'apt'
 ```
 
-All of the dependencies must be supplied as a hash:
+All of these extra dependencies must be supplied as a hash:
 
   - The key represents the name of the package.
   - The value represents the provider that Puppet must use to install it.
@@ -104,16 +112,18 @@ In the following example:
     - Owns his `$HOME`.
     - Is a `sudoer`.
     - Can login with username/password.
-    - Has a publish SSH key.
+    - Has both a public and a private SSH keys.
     - Allows users `dave`, `gru` and `stuart` to log in as him through SSH. Note that `gru` does not exist, so it will be skipped.
   - The user `stuart`:
     - Is created.
     - Does not own a `$HOME`.
     - Cannot login with username/password.
-    - Has a public SSH key.
+    - Has a public SSH key only.
     - Does not allow anyone to log in as him through SSH.
 
-```bash
+**YAML**
+```yaml
+---
 users::params::accounts:
   dave:
     authorized_keys:
@@ -141,14 +151,28 @@ users::params::accounts:
       key_label: 'stuart@minions.com'
       key_type: 'ssh-rsa'
 ```
+**eYAML**
+```yaml
+---
+users::params::secrets:
+  dave:
+    ssh:
+      private_key: |
+        -----BEGIN RSA PRIVATE KEY-----
+        super_secret
+        -----END RSA PRIVATE KEY-----
+```
+
 ```bash
 $ id dave
 uid=1004(dave) gid=1007(dave) groups=1007(dave),27(sudo),1004(foo)
 $ id stuart
 uid=1005(stuart) gid=1005(stuart) groups=1005(stuart),1004(foo)
 
-$ ls -l /home
-drwxr-xr-x 3 dave   dave   4096 Dec 12 19:23 dave
+$ ls -l /home/dave/.ssh
+-rwx------ 1 dave dave 66 Dec 12 19:23 authorized_keys
+-rw------- 1 dave dave 75 Dec 25 23:12 dave
+-rw-r-xr-x 1 dave dave  6 Dec 25 23:01 dave.pub
 
 $ cat /home/dave/.ssh/authorized_keys
 ssh-rsa QWERTY dave@minions.com
@@ -162,12 +186,19 @@ stuart::16781:0:99999:7:::
 ## Reference
 All data must be provided through `Hiera`. A user is defined by many attributes, some of which, *in italic*, are optional:
 
+**YAML**
+
   -  *`authorized_keys`*: A list of strings representing users managed through `lostinmalloc-users` that can log into the system as him. The public keys of these users are stored into his `$HOME/.ssh/authorized_keys`. If this value is not given for the user, none can log in as him through SSH keys.
   - *`groups`*: the groups he belongs to. Note that the group named after himself, also known as his *primary group*, should not be listed here, since it is generated automatically by the system. The groups the user belongs to are generated before any user is created, if they don't exist already.
   - `managehome`: a boolean, which defaults to `false`. If `true`, it generates the user has a `/home` named after himself and owns it. This parameter needs to be set as `true` if we want people to log into the system as him through SSH keys, since the `authorized_keys` is stored in his `$HOME/.ssh`.
   - *`password`*: the password used to login into the system. If an empty string is given the user cannot login this way. Note that the password **must not be passed as plain text** but encrypted. On `Debian` systems, the hash can be generated through the following command: `$  mkpasswd -m sha-512`. The command is part of the `makepasswd` package.
   - `present`: a boolean that states whether the user must be present or not. it defaults to false. If `false`, no resources will be allocated for the given user. Note that setting a previously existing user to `false` will wipe his `$HOME` out.
   - *`ssh`*: a hash used to provide the public SSH key of the user. This allows `lostinmalloc-users` to add this key to the `authorized_keys` of any users it manages.
+
+**eYAML**
+
+  - *`ssh`*
+    - `private_key`: the private SSH key of the user.
 
 ## Limitations
 `lostinmalloc-users` has been developed and tested on the following setup(s):

@@ -59,6 +59,31 @@ define users::manage
         require => File["/home/${name}"],
       }
       
+      # Manage SSH keys
+      $ssh_public_key = try_get_value($userdata, "ssh/key")
+      $ssh_private_key = try_get_value($::users::secrets, "${name}/ssh/private_key")
+      
+      if !empty($ssh_public_key) {
+        File{ "${name}_ssh_public_key":
+	  content => $ssh_public_key,
+          group   => $name,
+          mode    => '0655',
+          owner   => $name,
+          path    => "/home/${name}/.ssh/${name}.pub",
+        }
+      }
+
+      if !empty($ssh_private_key) {
+        File{ "${name}_ssh_private_key":
+          content => $ssh_private_key,
+          group   => $name,
+          mode    => '0600',
+          owner   => $name,
+          path    => "/home/${name}/.ssh/${name}"
+        }
+      }
+
+      # Manage authorized_keys 
       if ! empty($userdata['authorized_keys']) {
         file { "/home/${name}/.ssh/authorized_keys":
           ensure  => present,
