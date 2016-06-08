@@ -120,6 +120,12 @@ In the following example:
     - Cannot login with username/password.
     - Has a public SSH key only.
     - Does not allow anyone to log in as him through SSH.
+  - The user `www-data`:
+    - Is created.
+    - Does not own a `$HOME`.
+    - Cannot login with username/password.
+    - Has no SSH key.
+    - Does not allow anyone to log in as him through SSH.
 
 **YAML**
 ```yaml
@@ -150,6 +156,9 @@ users::params::accounts:
       key: 'banana'
       key_label: 'stuart@minions.com'
       key_type: 'ssh-rsa'
+  www-data:
+    managehome: false
+    present: true
 ```
 **eYAML**
 ```yaml

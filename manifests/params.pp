@@ -13,7 +13,7 @@ class users::params(
         ]
       }]
     ]
-  ] $secrets,
+  ] $secrets = {},
 
   Optional[
     Hash[
