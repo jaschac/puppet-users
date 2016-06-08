@@ -44,7 +44,7 @@ class users::params(
       String,
       String
     ]
-  ] $extra_dependencies,
+  ] $extra_dependencies = {},
 
   $mandatory_dependencies = {
     libshadow => 'gem',
